@@ -2,9 +2,13 @@
 A Julia implementation of Monte Carlo geometry processing in 2D space.
 
 It solves the Poisson equation:
+
 $$\Delta u = f, x\in\Omega$$
+
 with boundary Dirichlet boundary conditions
+
 $$u(x) = g(x), x\in \partial\Omega$$
+
 using the recursive Walk on Spheres method.
 
 ## Example outputs

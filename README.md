@@ -8,13 +8,16 @@ $u(x) = g(x), x\in \partial\Omega$
 using the recursive Walk on Spheres method.
 
 ## Example outputs
-![Animated boundary conditions](images/AnimatedBCs.gif)
+![Animated boundary conditions](./images/AnimatedBCs.gif)
+
 Animated Boundary Conditions
 
-![Animated scene](images/AnimatedScene.gif)
+![Animated scene](./images/AnimatedScene.gif)
+
 Animated geometries
 
-![Poisson solution](images/PoissonSolution.png)
+![Poisson solution](./images/PoissonSolution.png)
+
 Poisson equation solution
 
 ## Quick guide

@@ -1,5 +1,4 @@
 # mcfishy
-![2D Fish](./images/LaplaceFish.png)
 
 A Julia implementation of Monte Carlo geometry processing in 2D space.
 
@@ -13,18 +12,7 @@ $$u(x) = g(x), x\in \partial\Omega$$
 
 using the recursive Walk on Spheres method.
 
-## Example outputs
-![Animated boundary conditions](./AnimatedBCs.gif)
-
-Animated Boundary Conditions
-
-![Animated scene](./AnimatedScene.gif)
-
-Animated geometries
-
-![Poisson solution](./images/PoissonSolution.png)
-
-Poisson equation solution
+![2D Fish](./images/LaplaceFishTwilight.png)
 
 ## Quick guide
 
@@ -74,4 +62,17 @@ rendering = render(u, grid)
 image = viewImage(rendering, ColorSchemes.magma)
 image
 ```
+
+## Example outputs
+![Animated boundary conditions](./AnimatedBCs.gif)
+
+Animated Boundary Conditions
+
+![Animated scene](./AnimatedScene.gif)
+
+Animated geometries
+
+![Poisson solution](./images/PoissonSolution.png)
+
+Poisson equation solution
 

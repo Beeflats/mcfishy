@@ -45,7 +45,8 @@ grid = discretize(Ω, 200, 200)
 #### Solve the Poisson equation 
 Make a source function 
 ```
-f(x) = exp(-(x.x^2 + x.y^2))
+c = Point(0, 0) # centre of gaussian distribution
+f(x) = exp(-(x→c)⋅(x→c))
 ```
 and solve the Poisson equation:
 ```

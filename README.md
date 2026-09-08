@@ -2,17 +2,17 @@
 A Julia implementation of Monte Carlo geometry processing in 2D space.
 
 It solves the Poisson equation:
-$\Delta u = f, x\in\Omega$
+$$\Delta u = f, x\in\Omega$$
 with boundary Dirichlet boundary conditions
-$u(x) = g(x), x\in \partial\Omega$
+$$u(x) = g(x), x\in \partial\Omega$$
 using the recursive Walk on Spheres method.
 
 ## Example outputs
-![Animated boundary conditions](./images/AnimatedBCs.gif)
+![Animated boundary conditions](./AnimatedBCs.gif)
 
 Animated Boundary Conditions
 
-![Animated scene](./images/AnimatedScene.gif)
+![Animated scene](./AnimatedScene.gif)
 
 Animated geometries
 

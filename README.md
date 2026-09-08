@@ -64,11 +64,11 @@ image
 ```
 
 ## Example outputs
-![Animated boundary conditions](./AnimatedBCs.gif)
+![Animated boundary conditions](./images/AnimatedBCs.gif)
 
 Animated Boundary Conditions
 
-![Animated scene](./AnimatedScene.gif)
+![Animated scene](./images/AnimatedScene.gif)
 
 Animated geometries
 

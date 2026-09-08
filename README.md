@@ -1,4 +1,6 @@
 # mcfishy
+![2D Fish](./images/LaplaceFish.png)
+
 A Julia implementation of Monte Carlo geometry processing in 2D space.
 
 It solves the Poisson equation:

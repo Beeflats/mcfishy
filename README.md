@@ -68,9 +68,13 @@ image
 
 Animated Boundary Conditions
 
+
+
 ![Animated scene](./images/AnimatedScene.gif)
 
 Animated geometries
+
+
 
 ![Poisson solution](./images/PoissonSolution.png)
 

@@ -70,7 +70,7 @@ function nearestPoint(x::Point, c::Circle)
     return c.center ⊕ c.radius * unit(CX)
 end
 
-function nearestPoint(x::Point, l::Line
+function nearestPoint(x::Point, l::Line)
     d = l.point → x
     projected = d ∥ l.direction
     return l.point ⊕ projected

@@ -2,9 +2,10 @@
 Example implementation of the WoS solvers
 """
 
-include("LaplaceSolver.jl")
-include("PoissonSolver.jl")
-include("Render.jl")
+include("./src/LaplaceSolver.jl")
+include("./src/PoissonSolver.jl")
+include("./src/Render.jl")
+include("./src/PoissonGradient.jl")
 
 # Scene
 circle₁ = Circle(Point(-2.5,  2.0), 1.2)
@@ -36,7 +37,7 @@ num_Samples = 500  # Increase this for more WoS samples
 # Rendering domain
 Ω = makeDomain(10.0, 10.0)
 
-resolution = (256, 256)
+resolution = (256*2, 256*2)
 Nx, Ny = resolution
 ♯Ω = discretize(Ω, Nx, Ny)
 
@@ -55,8 +56,8 @@ Solve the equation
 with boundary condition
     u(x) = bc(x) with x ∈ ∂𝕊
 """
-u_laplace(p::Point) = solveLaplace(p, ∂𝕊, WoS_depth, num_Samples, ϵ)
-image_laplace = render(u_laplace, ♯Ω) # Render the scalar field with a discretized domain
+#u_laplace(p::Point) = solveLaplace(p, ∂𝕊, WoS_depth, num_Samples, ϵ)
+#image_laplace = render(u_laplace, ♯Ω) # Render the scalar field with a discretized domain
 
 """
 Solve the equation
@@ -65,11 +66,14 @@ with boundary condition
     u(x) = bc(x) with x ∈ ∂𝕊
 """
 f = f₁
-u_poisson(p::Point) = solvePoisson(p, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
-image_poisson = render(u_poisson, ♯Ω) # Render the scalar field with a discretized domain
+#u_poisson(p::Point) = solvePoisson(p, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
+#image_poisson = render(u_poisson, ♯Ω) # Render the scalar field with a discretized domain
+
+u_poissonGradient(p::Point) = solvePoissonGradient(p, ∂𝕊, x -> 0, WoS_depth, num_Samples, ϵ)
+image_poissongrad = render(u_poissonGradient, ♯Ω) # Render the scalar field with a discretized domain
 
 # Visualise
-image = image_laplace
+image = norm.(image_poissongrad)
 viewImage(image, ColorSchemes.magma)
 
 # Other implementations to try/PDEs to solve:

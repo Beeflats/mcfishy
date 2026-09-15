@@ -169,14 +169,19 @@ function viewImage(rendering, colorscheme = ColorSchemes.grays)
         ColorSchemes.Set2
         ColorSchemes.tab10
     """
-    lo = minimum(rendering)
-    hi = maximum(rendering)
+    finite_values = rendering[isfinite.(rendering)]
+    isempty(finite_values) && error("Rendering contains no finite values")
+
+    lo = minimum(finite_values)
+    hi = maximum(finite_values)
     normalized = if hi == lo
         zeros(Float64, size(rendering))
     else
         (rendering .- lo) ./ (hi - lo)
     end
+    normalized = replace(normalized, NaN => 0.0)
     image = [get(colorscheme, normalized[i, j])
-                for i ∈ axes(normalized, 1), j ∈ axes(normalized, 2)]
+            for i ∈ axes(normalized, 1), j ∈ axes(normalized, 2)]
+
     return ImageView.imshow(image)
 end

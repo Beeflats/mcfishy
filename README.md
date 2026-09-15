@@ -32,8 +32,8 @@ line = LineSegment(Point(-3.0, -2.0), Point(3.0, -2.0))
 #### Create a rendering domain
 Define the region over which the solution can be evaluated. The domain needs to be discretised into a lattice to be able to be displayed on a computer.
 ```
-Ω = makeDomain(10.0, 10.0)
-grid = discretize(Ω, 200, 200)
+Ω = makeDomain(10.0, 10.0) # continuous rectangular domain [-5,5] × [-5, 5]
+♯Ω = discretize(Ω, 200, 200) # 200 x 200 resolution
 ```
 
 #### Solve the Poisson equation 
@@ -54,7 +54,7 @@ u(x) = solveLaplace(x, ∂Ω, WoS_depth, num_Samples, ϵ)
 
 Evaluate the solution on the rendering domain
 ```
-rendering = render(u, grid)
+rendering = render(u, ♯Ω)
 ```
 
 #### Visualise the solution
@@ -80,3 +80,9 @@ Animated geometries
 
 Poisson equation solution
 
+## Next steps
+- Extend solver for vector fields (no visualisation)
+- Extend solver for 3D domains (no visualisation)
+- Solve gradient of Poisson solution
+- Solve curl of Poisson solution
+- Endomorphism fields as vector field gradient/curl

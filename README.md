@@ -14,6 +14,8 @@ using the recursive Walk on Spheres method.
 
 ![2D Fish](./images/LaplaceFishTwilight.png)
 
+To learn the theory behind Walk on Spheres, read [MCGP resources](https://github.com/rohan-sawhney/mcgp-resources).
+
 ## Quick guide
 
 #### Create a boundary scene
@@ -69,11 +71,9 @@ image
 Animated Boundary Conditions
 
 
-
 ![Animated scene](./images/AnimatedScene.gif)
 
 Animated geometries
-
 
 
 ![Poisson solution](./images/PoissonSolution.png)
@@ -81,8 +81,8 @@ Animated geometries
 Poisson equation solution
 
 ## Next steps
-- Extend solver for vector fields (no visualisation)
-- Extend solver for 3D domains (no visualisation)
-- Solve gradient of Poisson solution
-- Solve curl of Poisson solution
-- Endomorphism fields as vector field gradient/curl
+- Extend solver for 3D domains
+- Visualise 2D vector fields [[paper](https://vc.tf.fau.de/publications/Tian25EuroVisShort/Tian25EuroVisShort.pdf)]
+- Visualise cross sections of 3D fields
+- Visualise 3D scalar (and vector) fields
+- Visualise 2D endomorphism fields

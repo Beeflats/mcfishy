@@ -1,59 +1,80 @@
 include("Geometry.jl")
 
 # Boundary-condition objects
-struct Object
-    geometry::Geometry
+abstract type Boundary end
+
+struct Boundary2D <: Boundary
+    geometry::Geometry2D
     u::Function
 end
 
-object(geometry::Geometry, u::Function) = Object(geometry, u)
-
-object(geometry::Geometry, c::Number) = Object(geometry, x -> c)
-
-object(geometry::Geometry, v::Vect) = Object(geometry, x -> v)
-
-(o::Object)(x::Point) = o.u(x) # Evaluate the boundary condition associated with an object.
-
-# Convenience constructors
-Dirichlet(geometry::Geometry, c::Number) = object(geometry, c)
-Dirichlet(geometry::Geometry, v::Vect) = object(geometry, v)
-Dirichlet(geometry::Geometry, u::Function) = object(geometry, u)
-
-# Scene
-struct Scene
-    objects::Vector{Object}
+struct Boundary3D <: Boundary
+    geometry::Geometry3D
+    u::Function
 end
 
-scene() = Scene(Object[])
-scene(o::Object...) = Scene(Object[o...])
-scene(objects::Tuple...) = Scene(Object[object(geometry, u) for (geometry, u) ∈ objects])
+boundary(geometry::Geometry2D, u::Function) = Boundary2D(geometry, u)
+boundary(geometry::Geometry3D, u::Function) = Boundary3D(geometry, u)
+boundary(geometry::Geometry2D, c::Number) = Boundary2D(geometry, x -> c)
+boundary(geometry::Geometry3D, c::Number) = Boundary3D(geometry, x -> c)
+boundary(geometry::Geometry2D, v::Vec) = Boundary2D(geometry, x -> v)
+boundary(geometry::Geometry3D, v::Vec) = Boundary3D(geometry, x -> v)
 
-scene(mesh::AbstractVector{<:Geometry}, u::Function) = Scene(Object[object(geometry, u) for geometry ∈ mesh])
+(o::Boundary)(x::Point) = o.u(x) # Evaluate the boundary condition.
+
+# Convenience constructors
+Dirichlet(geometry::Geometry, c::Number) = boundary(geometry, c)
+Dirichlet(geometry::Geometry, v::Vec) = boundary(geometry, v)
+Dirichlet(geometry::Geometry, u::Function) = boundary(geometry, u)
+
+# Scene
+abstract type Scene end
+
+struct Scene2D <: Scene
+    boundaries::Vector{Boundary2D}
+end
+
+struct Scene3D <: Scene
+    boundaries::Vector{Boundary3D}
+end
+
+scene2D() = Scene2D(Boundary2D[])
+scene3D() = Scene3D(Boundary3D[])
+scene(o::Boundary2D...) = Scene2D(Boundary2D[o...])
+scene(o::Boundary3D...) = Scene3D(Boundary3D[o...])
+scene(boundaries::Tuple...) = scene((boundary(geometry, u) for (geometry, u) in boundaries)...)
+
+scene(mesh::AbstractVector{<:Geometry}, u::Function) = scene((boundary(geometry, u) for geometry ∈ mesh)...)
 scene(mesh::AbstractVector{<:Geometry}, c::Number) = scene(mesh, x -> c)
-scene(mesh::AbstractVector{<:Geometry}, v::Vect) = scene(mesh, x -> v)
+scene(mesh::AbstractVector{<:Geometry}, v::Vec) = scene(mesh, x -> v)
 
-# Adding objects to a scene
-Base.:∪(𝕊::Scene, o::Object) = Scene([𝕊.objects... o])
-Base.:∪(𝕊::Scene, objects::Vector{Object}) = Scene([𝕊.objects... objects...])
-Base.:∪(𝕊₁::Scene, 𝕊₂::Scene) = Scene([𝕊₁.objects... 𝕊₂.objects...])
-Base.:∪(o::Object, 𝕊::Scene) = 𝕊 ∪ o
-Base.:∪(o₁::Object, o₂::Object) = scene(o₁, o₂)
+# Adding boundaries to a scene
+Base.:∪(𝕊::Scene2D, o::Boundary2D) = Scene2D([𝕊.boundaries..., o])
+Base.:∪(𝕊::Scene3D, o::Boundary3D) = Scene3D([𝕊.boundaries..., o])
+Base.:∪(𝕊::Scene, boundaries::Vector{Boundary}) = Scene([𝕊.boundaries... boundaries...])
+Base.:∪(𝕊₁::Scene2D, 𝕊₂::Scene2D) = Scene2D([𝕊₁.boundaries..., 𝕊₂.boundaries...])
+Base.:∪(𝕊₁::Scene3D, 𝕊₂::Scene3D) = Scene3D([𝕊₁.boundaries..., 𝕊₂.boundaries...])
+Base.:∪(o::Boundary, 𝕊::Scene) = 𝕊 ∪ o
+Base.:∪(o₁::Boundary, o₂::Boundary) = scene(o₁, o₂)
+Base.:∪(::Scene2D, ::Scene3D) = throw(ArgumentError("Cannot combine 2D and 3D scenes"))
+Base.:∪(::Scene3D, ::Scene2D) = throw(ArgumentError("Cannot combine 2D and 3D scenes"))
 
-# Distance to objects
-distance(x::Point, obj::Object) = distance(x, obj.geometry)
-nearestPoint(x::Point, obj::Object) = nearestPoint(x, obj.geometry)
+# Distance to boundaries
+distance(x::Point, bndry::Boundary) = distance(x, bndry.geometry)
+nearestPoint(x::Point, bndry::Boundary) = nearestPoint(x, bndry.geometry)
 
 # Distance to scene
 function distance(x::Point, 𝕊::Scene)
-    isempty(𝕊.objects) && throw(ArgumentError("Cannot compute distance to an empty Scene"))
-    return minimum(distance(x, obj) for obj ∈ 𝕊.objects)
+    isempty(𝕊.boundaries) && throw(ArgumentError("Cannot compute distance to an empty Scene"))
+    return minimum(distance(x, bndry) for bndry ∈ 𝕊.boundaries)
 end
 
-# Nearest object and point
+# Nearest boundary and point
 function nearest(x::Point, 𝕊::Scene)
-    isempty(𝕊.objects) && throw(ArgumentError("Cannot find nearest object in an empty Scene"))
-    distances = [distance(x, obj) for obj ∈ 𝕊.objects]
-    obj_nearest = 𝕊.objects[argmin(distances)]
-    x_nearest = nearestPoint(x, obj_nearest)
-    return x_nearest, obj_nearest
+    isempty(𝕊.boundaries) && throw(ArgumentError("Cannot find nearest boundary in an empty Scene"))
+    distances = [distance(x, bndry) for bndry ∈ 𝕊.boundaries]
+    bndry_nearest = 𝕊.boundaries[argmin(distances)]
+    x_nearest = nearestPoint(x, bndry_nearest)
+    return x_nearest, bndry_nearest
 end
+

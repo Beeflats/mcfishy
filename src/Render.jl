@@ -5,40 +5,36 @@ include("Vectors.jl")
 
 # Render domains
 struct RenderDomain
-    p₁::Point               # bottom-left corner
+    p₁::Point2               # bottom-left corner
     width::Float64          # horizontal extent
     length::Float64         # vertical extent
-    horizontalBasis::Vect   # unit vector along the horizontal direction
-    verticalBasis::Vect     # unit vector along the vertical direction
+    horizontalBasis::Vector2   # unit vector along the horizontal direction
+    verticalBasis::Vector2     # unit vector along the vertical direction
 end
 
 struct DiscretizedRenderDomain
     domain::RenderDomain
     Nx::Int
     Ny::Int
-    grid::Matrix{Point}     # grid[i,j] is the point at horizontal index i and vertical index j.
+    grid::Matrix{Point2}     # grid[i,j] is the point at horizontal index i and vertical index j.
 end
 
 # Domain construction
-function makeDomain(p₁::Point, p₂::Point)
+function makeDomain(p₁::Point2, p₂::Point2)
     """
     Construct an axis-aligned rectangular domain from its
     bottom-left and top-right corners.
     """
     width = p₂.x - p₁.x
     length = p₂.y - p₁.y
-    width > 0 || throw(ArgumentError(
-        "p₂ must lie to the right of p₁"
-    ))
-    length > 0 || throw(ArgumentError(
-        "p₂ must lie above p₁"
-    ))
-    horizontalBasis = Vect(1.0, 0.0)
-    verticalBasis = Vect(0.0, 1.0)
+    width > 0 || throw(ArgumentError("p₂ must lie to the right of p₁"))
+    length > 0 || throw(ArgumentError("p₂ must lie above p₁"))
+    horizontalBasis = î₂
+    verticalBasis = ĵ₂
     return RenderDomain(p₁, width, length, horizontalBasis, verticalBasis)
 end
 
-function makeDomain(p₁::Point, width::Real, aspectRatio::Real)
+function makeDomain(p₁::Point2, width::Float64, aspectRatio::Float64)
     """
     Construct a rectangular domain from its bottom-left corner,
     width, and aspect ratio.
@@ -47,10 +43,10 @@ function makeDomain(p₁::Point, width::Real, aspectRatio::Real)
     width > 0 || throw(ArgumentError("width must be positive"))
     aspectRatio > 0 || throw(ArgumentError("aspectRatio must be positive"))
     length = width / aspectRatio
-    return RenderDomain(p₁, Float64(width), Float64(length), Vect(1.0, 0.0), Vect(0.0, 1.0))
+    return RenderDomain(p₁, Float64(width), Float64(length), î₂, ĵ₂)
 end
 
-function makeDomain(center::Point, width::Real, aspectRatio::Real, orientation::Vect)
+function makeDomain(center::Point2, width::Float64, aspectRatio::Float64, orientation::Vector2)
     """
     Construct a rectangular domain from its centre, width,
     aspect ratio, and orientation.
@@ -68,16 +64,16 @@ function makeDomain(center::Point, width::Real, aspectRatio::Real, orientation::
     return RenderDomain(p₁, Float64(width), Float64(length), horizontalBasis, verticalBasis)
 end
 
-function makeDomain(width::Real, length::Real)
+function makeDomain(width::Float64, length::Float64)
     """
     Construct an axis-aligned rectangular domain centred at the origin.
     """
     width > 0 || throw(ArgumentError("width must be positive"))
     length > 0 || throw(ArgumentError("length must be positive"))
-    return makeDomain(Point(0.0, 0.0), Float64(width), Float64(width / length), Vect(1.0, 0.0))
+    return makeDomain(Point2(0.0, 0.0), Float64(width), Float64(width / length), î₂)
 end
 
-function makeDomain(p₁::Point, p₂::Point, aspectRatio::Real)
+function makeDomain(p₁::Point2, p₂::Point2, aspectRatio::Float64)
     """
     Construct a rectangular domain from two opposite corners and
     an aspect ratio.
@@ -145,10 +141,11 @@ function render(u::Function, domain::RenderDomain, Nx::Integer, Ny::Integer)
     return render(u, ♯domain)
 end
 
-#TODO: Vector field visualisation; current visualisation works for scalar fields
+#TODO: Vector field and endomorphism field visualisation; current visualisation only works for scalar fields
 
 # Visualisation
-function viewImage(rendering, colorscheme = ColorSchemes.grays)
+defaultColorScheme = ColorSchemes.balance;
+function viewImage(rendering, colorscheme = defaultColorScheme)
     """
     Color schemes to choose from:
         ColorSchemes.viridis
@@ -185,3 +182,5 @@ function viewImage(rendering, colorscheme = ColorSchemes.grays)
 
     return ImageView.imshow(image)
 end
+
+#TODO: Visualise solutions to 3D scenes

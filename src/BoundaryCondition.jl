@@ -38,6 +38,8 @@ struct Scene3D <: Scene
     boundaries::Vector{Boundary3D}
 end
 
+size(𝕊::Scene) = length(𝕊.boundaries)
+
 scene2D() = Scene2D(Boundary2D[])
 scene3D() = Scene3D(Boundary3D[])
 scene(o::Boundary2D...) = Scene2D(Boundary2D[o...])

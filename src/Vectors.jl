@@ -258,9 +258,9 @@ function endomorphism(λ₁::Number, v₁::Vector2,
     return endomorphism(v₁, λ₁*v₁, v₂, λ₂*v₂)
 end
 
-function endomorphism(λ₁::Number, v₁::Vector2,
-                      λ₂::Number, v₂::Vector2,
-                      λ₃::Number, v₃::Vector2)
+function endomorphism(λ₁::Number, v₁::Vector3,
+                      λ₂::Number, v₂::Vector3,
+                      λ₃::Number, v₃::Vector3)
     """
     An endomorphism M in which
         M(v₁) = λ₁v₁,

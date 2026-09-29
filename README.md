@@ -35,7 +35,7 @@ $$\hat u(\mathbf{x}_k) :=
 
 with $\mathbf{x}_{k+1}$ drawn a uniform distribution on the largeset sphere around $\mathbf{x}_k$. 
 
-The algorithm will almost certainly never terminate, so when $$d(\mathbf{x}_k, \mathbf{x}_{k+1})$$ is less than some small value $\varepsilon$, it terminates and evaluates $g(\mathbf{\bar x}_k)$ where $\mathbf{\bar x}$ is the point on the boundary  closest to the point $\mathbf{x}_k$, i.e. $$\mathbf{\bar x}_k = \argmin_{\mathbf{z}\in\partial\Omega}d(\mathbf{x},\mathbf{z})$$. Other ways of terminating the algorithm is to set an limit to how high $k$ can be.
+The algorithm will almost certainly never terminate, so when $d(\mathbf{x}\_k, \mathbf{x}\_{k+1})$ is less than some small value $\varepsilon$, it terminates and evaluates $g(\mathbf{\bar x}_k)$ where $\mathbf{\bar x}$ is the point on the boundary  closest to the point $\mathbf{x}_k$, i.e. $\mathbf{\bar x}\_k = \underset{\mathbf{z}\in\partial\Omega}{\text{arg min }} d(\mathbf{x},\mathbf{z})$. Other ways of terminating the algorithm is to set an limit to how high $k$ can be.
 
 This repository also includes methods for computing the gradient and curl of the vector field solution to the Poisson equation using Walk-on-Spheres. 
 The paper used as a reference was [Monte Carlo Geometry Processing (2020)](http://www.rohansawhney.io/mcgp.pdf) by Sawhney and Crane. To learn more on the theory behind Walk on Spheres, read [MCGP resources](https://github.com/rohan-sawhney/mcgp-resources). 

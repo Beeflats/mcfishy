@@ -77,7 +77,7 @@ u(x) = solvePoisson(x, ∂Ω, f, WoS_depth, num_Samples, ϵ)
 
 Evaluate the solution $u$ at every point on the discretized rendering domain:
 ```
-rendering = render(u, ♯Ω)
+rendering = u.(♯Ω.grid)
 ```
 
 #### Visualise the solution

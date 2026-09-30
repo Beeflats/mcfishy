@@ -4,13 +4,15 @@ A Julia implementation of Monte Carlo geometry processing in 2D space.
 
 It solves the Poisson equation:
 
-$$\Delta u(\mathbf{x}) = f(\mathbf{x}), \quad\quad \mathbf{x}\in\Omega$$
+$$\Delta u(\mathbf{x}) = f(\mathbf{x}), \quad\quad \mathbf{x}\in\mathbb{R}^2$$
 
 with boundary Dirichlet boundary conditions
 
-$$u(\mathbf{x}) = g(\mathbf{x}), \quad\quad \mathbf{x}\in \partial\Omega$$
+$$u(\mathbf{x}) = g(\mathbf{x}), \quad\quad \mathbf{x}\in \Gamma$$
 
 using the recursive Walk on Spheres method.
+
+Here, $\Gamma$ is the boundary of solid objects defined in a scene.
 
 ![2D Fish](./images/LaplaceFishTwilight.png)
 
@@ -19,7 +21,7 @@ The Poisson equation can be reformulated as
 
 $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x})|}\int_{\partial B(\mathbf{x})} u(\mathbf{y}) d\mathbf{y} - \int_{B(\mathbf{x})} f(\mathbf{y})G(\mathbf{x}, \mathbf{y}) d\mathbf{y}.$$
 
-where $G(x,y)$ is a convolution kernel (more specifically, Green's function). When rewritten as an integral equation, the Poisson equation can hence be solved via Monte Carlo methods. 
+where $G$ is a convolution kernel (more specifically, Green's function), and $B(\mathbf{x})$ is a ball centered at $\mathbf{x}$. When rewritten as an integral equation, the Poisson equation can hence be solved via Monte Carlo methods. 
 
 The algorithm for evaluating the solution to the Poisson equation at a point $\mathbf{x}_0$ in the domain is 
 
@@ -29,7 +31,7 @@ where $N$ is the number of Monte Carlo samples to collect, and
 
 $$\hat u(\mathbf{x}_k) :=
 \begin{cases}
-    g(\mathbf{x}_k) & \text{if }\mathbf{x}_k\in\partial\Omega \\
+    g(\mathbf{x}_k) & \text{if }\mathbf{x}_k\in\Gamma \\
     \hat u(\mathbf{x}_{k+1}) - |B(\mathbf{x}_k)|f(\mathbf{y}_k)G(\mathbf{x}_k, \mathbf{y}_k)  & \text{otherwise}
 \end{cases} $$
 
@@ -43,7 +45,7 @@ The paper used as a reference was [Monte Carlo Geometry Processing (2020)](http:
 ## Quick guide
 
 #### Create a boundary scene
-Create geometric objects and assign boundary conditions to them. A scene is defined to be the union of geometric objects with some boundary condition(s).
+Model the scene using geometric primitives and assign boundary conditions to them.
 ```
 circle₁ = Circle(Point(-2.0, 0.0), 1.0)
 bc₁(x) = sin(5x.x) + cos(3x.y)
@@ -53,36 +55,47 @@ bc₂(x) = 2.0 + cos(4x.x)
 
 line = LineSegment(Point(-3.0, -2.0), Point(3.0, -2.0))
 bc_line(x) = 2.0 + sin(4x.x)
-
-∂Ω = boundary(circle₁, bc₁) ∪ boundary(circle₂, bc₂) ∪ boundary(line, bc_line)
 ```
 
-#### Create a rendering domain
-Define the region over which the solution can be evaluated. The domain needs to be discretised into a lattice to be able to be displayed on a computer.
+A scene is defined to be the union of the geometric primitives and their assigned boundary condition(s).
+```
+∂𝕊 = boundary(circle₁, bc₁) ∪ boundary(circle₂, bc₂) ∪ boundary(line, bc_line)
+```
+
+#### Define the source function 
+Make a source function 
+```
+c = Point(0.5, 0.5) # centre of gaussian distribution
+f(x) = exp(-(c→x)⋅(c→x))
+```
+
+#### Define the solution to the Poisson equation:
+```
+WoS_depth = 40
+num_Samples = 300
+ϵ = 0.01
+u(x) = solvePoisson(x, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
+```
+If the source function is $f(x) = 0$, then one can use `solveLaplace(x, ∂𝕊, WoS_depth, num_Samples, ϵ)` instead.
+
+#### Visualize the solution
+At this stage, the solution can be evaluated at a single point: `u(Point(0, 0))`, however this is uninteresting.
+
+To observe local properties of $u$, create a domain, $\Omega$, for which the solution is evaluated over.
+The domain will then need to be discretised into a lattice, $\sharp\Omega$, to be able to be displayed on a computer.
 ```
 Ω = makeDomain(10.0, 10.0) # continuous rectangular domain [-5,5] × [-5, 5]
 ♯Ω = discretize(Ω, 200, 200) # 200 x 200 resolution
 ```
 
-#### Solve the Poisson equation 
-Make a source function 
+Evaluate the solution $u$ at every point on the discretized rendering domain (this is the part which will take the longest):
 ```
-c = Point(0.5, 0.5) # centre of gaussian distribution
-f(x) = exp(-(x→c)⋅(x→c))
-```
-and define the solution to the Poisson equation:
-```
-u(x) = solvePoisson(x, ∂Ω, f, WoS_depth, num_Samples, ϵ)
+evaluation = u.(♯Ω.grid)
 ```
 
-Evaluate the solution $u$ at every point on the discretized rendering domain:
+Display the solution over the specified domain
 ```
-rendering = u.(♯Ω.grid)
-```
-
-#### Visualise the solution
-```
-image = viewImage(rendering, ColorSchemes.magma)
+image = viewImage(evaluation, ColorSchemes.magma)
 image
 ```
 

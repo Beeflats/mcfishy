@@ -74,7 +74,7 @@ with boundary condition
     u(x) = bc(x) with x ∈ ∂𝕊
 """
 u_laplace(p::Point) = solveLaplace(p, ∂𝕊, WoS_depth, num_Samples, ϵ)
-#image_laplace = render(u_laplace, ♯Ω) # Render the scalar field with a discretized domain
+laplace_evaluated = u_laplace.(♯Ω.grid) # Render the scalar field with a discretized domain
 
 """
 Solve the equation
@@ -84,25 +84,10 @@ with boundary condition
 """
 f = f₁
 u_poisson(p::Point) = solvePoisson(p, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
-poisson_evaluated = u_poisson.(♯Ω.grid) # Render the scalar field with a discretized domain
+laplace_evaluated = u_poisson.(♯Ω.grid) # Render the scalar field with a discretized domain
 
-u_poissonGradient(p::Point) = solvePoissonGradient(p, ∂𝕊, x -> 0.05 * f(x), WoS_depth, num_Samples, ϵ)
-poissongrad_evaluated = u_poissonGradient.(♯Ω.grid)
-image_normpoissongrad = norm.(poissongrad_evaluated);
-
-# Visualise
-function process(image)
-    # A quick, dirty method to remove NaNs from an image
-    image = copy(image)
-    for i ∈ axes(image, 1), j ∈ axes(image, 2)
-        if isnan(image[i, j])
-            image[i, j] = 0
-        end
-    end
-    return image
-end
-
-image = process(image_normpoissongrad); # choose from image_laplace, image_poisson or image_normpoissongrad
+# Visualize solution
+image = laplace_evaluated; # choose from laplace_evaluated or laplace_evaluated
 viewImage(image, ColorSchemes.twilight)
 
 # Other implementations to try/PDEs to solve:

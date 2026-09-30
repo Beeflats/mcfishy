@@ -128,12 +128,7 @@ end
 
 # Rendering
 function render(u::Function, ♯domain::DiscretizedRenderDomain)
-    """
-    Evaluate u at every point in the rendering grid.
-    The returned matrix has the same dimensions as the grid.
-    """
-    return [u(♯domain.grid[i, j])
-                for i ∈ 1:♯domain.Nx, j ∈ 1:♯domain.Ny]
+    return u.(♯domain.grid)
 end
 
 function render(u::Function, domain::RenderDomain, Nx::Integer, Ny::Integer)

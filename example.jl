@@ -84,11 +84,11 @@ with boundary condition
 """
 f = f₁
 u_poisson(p::Point) = solvePoisson(p, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
-image_poisson = render(u_poisson, ♯Ω) # Render the scalar field with a discretized domain
+poisson_evaluated = u_poisson.(♯Ω.grid) # Render the scalar field with a discretized domain
 
 u_poissonGradient(p::Point) = solvePoissonGradient(p, ∂𝕊, x -> 0.05 * f(x), WoS_depth, num_Samples, ϵ)
-image_poissongrad = render(u_poissonGradient, ♯Ω) # Render the scalar field with a discretized domain
-image_normpoissongrad = norm.(image_poissongrad);
+poissongrad_evaluated = u_poissonGradient.(♯Ω.grid)
+image_normpoissongrad = norm.(poissongrad_evaluated);
 
 # Visualise
 function process(image)

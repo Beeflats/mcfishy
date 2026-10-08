@@ -35,3 +35,9 @@ G(x::Point3, y::Point3, R::Float64) = 1/(4π) * (R - distance(x,y))/(R * distanc
 ∇G(x::Point3, y::Point3, R::Float64) = (x → y)/(4π) * (1/distance(x,y)^3 - 1/R^3)
 #∫G(x::Point3, y::Point3, R::Float64) = R^2 / 6 
 
+struct Parameters
+    forcing::Function
+    scene::Scene
+    depth::Number
+    thickness::Float64
+end

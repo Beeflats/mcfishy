@@ -31,3 +31,7 @@ function solvePoissonGradient(x::Point, Ω::Scene, f::Function, WoS_depth::Integ
     # Outputs are more accurate with high sample counts (≥500)
     return mean([walkOnSphere_PoissonGradient(x, Ω, f, WoS_depth, ϵ) for _ in 1:num_Samples])
 end
+
+function ∇û(x::Point, Θ::Parameters)
+    return walkOnSphere_PoissonGradient(x, Θ.scene, Θ.forcing, Θ.depth, Θ.thickness)
+end

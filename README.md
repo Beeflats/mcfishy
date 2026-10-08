@@ -21,7 +21,7 @@ The Poisson equation can be reformulated as
 
 $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x})|}\int_{\partial B(\mathbf{x})} u(\mathbf{y}) d\mathbf{y} - \int_{B(\mathbf{x})} f(\mathbf{y})G(\mathbf{x}, \mathbf{y}) d\mathbf{y}.$$
 
-where $G$ is a convolution kernel (more specifically, Green's function), and $B(\mathbf{x})$ is a ball centered at $\mathbf{x}$. When rewritten as an integral equation, the Poisson equation can hence be solved via Monte Carlo methods. 
+where $G$ is a convolution kernel (more specifically, Green's function), and $B(\mathbf{x})$ is a circle centered at $\mathbf{x}$. When rewritten as an integral equation, the Poisson equation can hence be solved via Monte Carlo methods. 
 
 The algorithm for evaluating the solution to the Poisson equation at a point $\mathbf{x}_0$ in the domain is 
 
@@ -32,12 +32,18 @@ where $N$ is the number of Monte Carlo samples to collect, and
 $$\hat u(\mathbf{x}_k) :=
 \begin{cases}
     g(\mathbf{x}_k) & \text{if }\mathbf{x}_k\in\Gamma \\
-    \hat u(\mathbf{x}_{k+1}) - |B(\mathbf{x}_k)|f(\mathbf{y}_k)G(\mathbf{x}_k, \mathbf{y}_k)  & \text{otherwise}
+    \hat u(\mathbf{x}_{k+1}) - |B_\Gamma(\mathbf{x}_k)|f(\mathbf{y}_k)G(\mathbf{x}_k, \mathbf{y}_k)  & \text{otherwise}
 \end{cases} $$
 
-with $\mathbf{x}_{k+1}$ drawn a uniform distribution on the largeset sphere around $\mathbf{x}_k$. 
+with $B_\Gamma(\mathbf{x}) = \{\mathbf{y}\in\mathbb{R}^2: d(\mathbf{x}, \mathbf{y})= d(\mathbf{x},\Gamma)\}$ is a circle whose radius is $d(\mathbf{x},\Gamma)$, and $\mathbf{x}_{k+1}$ is drawn from a uniform distribution of $B_\Gamma(x_k)$. 
 
-The algorithm will almost certainly never terminate, so when $d(\mathbf{x}\_k, \mathbf{x}\_{k+1})$ is less than some small value $\varepsilon$, it terminates and evaluates $g(\mathbf{\bar x}_k)$ where $\mathbf{\bar x}$ is the point on the boundary  closest to the point $\mathbf{x}_k$, i.e. $\mathbf{\bar x}\_k = \underset{\mathbf{z}\in\partial\Omega}{\text{arg min }} d(\mathbf{x},\mathbf{z})$. Other ways of terminating the algorithm is to set an limit to how high $k$ can be.
+The algorithm will almost certainly never terminate as the sampled point is unlikely to coincide with the boundary. The algorithm is altered such that when $d(\mathbf{x}_k, \mathbf{x}_{k+1})$ is less than some small value $\varepsilon$, it terminates and evaluates $g(\mathbf{\bar x}_k)$ where $\mathbf{\bar x}$ is the point on the boundary  closest to the point $\mathbf{x}_k$, i.e. $\mathbf{\bar x}_k = \underset{\mathbf{z}\in\partial\Gamma}{\text{arg min }} d(\mathbf{x}_k,\mathbf{z})$. Other ways of terminating the algorithm is to set an limit, $K$, to how high $k$ can be. Thus, in practice, the algorithm for $\hat u(x_k)$ is as follows:
+
+$$\hat u(\mathbf{x}_k; f, \Gamma, g, K, \epsilon) :=
+\begin{cases}
+    g(\mathbf{x}_k) & \text{if }d(\mathbf{x}_k, \mathbf{x}_{k+1})<\epsilon \text{ or }k > K\\
+    \hat u(\mathbf{x}_{k+1}) - |B_\Gamma(\mathbf{x}_k)|f(\mathbf{y}_k)G(\mathbf{x}_k, \mathbf{y}_k)  & \text{otherwise}
+\end{cases} $$
 
 This repository also includes methods for computing the gradient and curl of the vector field solution to the Poisson equation using Walk-on-Spheres. 
 The paper used as a reference was [Monte Carlo Geometry Processing (2020)](http://www.rohansawhney.io/mcgp.pdf) by Sawhney and Crane. To learn more on the theory behind Walk on Spheres, read [MCGP resources](https://github.com/rohan-sawhney/mcgp-resources). 
@@ -56,17 +62,19 @@ bc₂(x) = 2.0 + cos(4x.x)
 line = LineSegment(Point(-3.0, -2.0), Point(3.0, -2.0))
 bc_line(x) = 2.0 + sin(4x.x)
 ```
+A circle with center $\mathbf{C}$ and radius $r$ is the set $\{x\in\mathbf{R}^2: d(\mathbf{C}, \mathbf{x}) = r\}$, and a line segment with endpoints $\mathbf{p},\mathbf{q}$ is the set where the strict triangle inequality holds: $\{x\in\mathbf{R}^2: d(\mathbf{p}, \mathbf{x})+d(\mathbf{x},\mathbf{q}) = d(\mathbf{p}, \mathbf{q})\}$.
 
-A scene is defined to be the union of the geometric primitives and their assigned boundary condition(s).
+
+A scene, $\partial\mathbb{S}$, is defined to be the union of the geometric primitives and their assigned boundary condition(s). 
 ```
 ∂𝕊 = boundary(circle₁, bc₁) ∪ boundary(circle₂, bc₂) ∪ boundary(line, bc_line)
 ```
-
+Given geometric primitives $G_1, G_2, ..., G_k$ and respective boundary conditions $g_1, g_2, ..., g_k$, a scene can be thought of as the ordered pair $\partial\mathbb{S} = (\Gamma, g)$, where $\Gamma := \bigcup_i G_i$, and $g(\mathbf{x}) := g_i(\mathbf{x})$ if $\mathbf{x}\in G_i$ is defined over the subspace $\Gamma$.
 #### Define the source function 
 Make a source function 
 ```
 c = Point(0.5, 0.5) # centre of gaussian distribution
-f(x) = exp(-(c→x)⋅(c→x))
+f(x) = exp(-(c→x)⋅(c→x)) # a scalar field
 ```
 
 #### Define the solution to the Poisson equation:
@@ -74,12 +82,22 @@ f(x) = exp(-(c→x)⋅(c→x))
 WoS_depth = 40
 num_Samples = 300
 ϵ = 0.01
-u(x) = solvePoisson(x, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
+
+Θ = Parameters(f, ∂𝕊, WoS_depth, ϵ)
+
+u(x) = mean(û(x, Θ) for k ∈ 1:num_Samples) # u\hat + [tab]
 ```
-If the source function is $f(x) = 0$, then one can use `solveLaplace(x, ∂𝕊, WoS_depth, num_Samples, ϵ)` instead.
+
+If the user wants to compute the gradient of $u$, they can instead enter:
+
+```
+∇u(x) = mean(∇û(x, Θ) for k ∈ 1:num_Samples) # \nabla + [tab] + u\hat + [tab]
+```
+
+If the `û` notation is not preferred, one can instead use the `solveLaplace`, `solvePoisson`, and `solvePoissonGradient` functions.
 
 #### Visualize the solution
-At this stage, the solution can be evaluated at a single point: `u(Point(0, 0))`, however this is uninteresting.
+At this stage, the solution can be evaluated at a single point e.g. `u(Point(0, 0))`, however this is uninteresting.
 
 To observe local properties of $u$, create a domain, $\Omega$, for which the solution is evaluated over.
 The domain will then need to be discretised into a lattice, $\sharp\Omega$, to be able to be displayed on a computer.
@@ -93,14 +111,14 @@ Evaluate the solution $u$ at every point on the discretized rendering domain (th
 evaluation = u.(♯Ω.grid)
 ```
 
-Display the solution over the specified domain
+Display the solution over the specified domain (only works for scalar field solutions):
 ```
 image = viewImage(evaluation, ColorSchemes.magma)
 image
 ```
 
 ### Vector field implementation
-Here, we solved the Poisson equation for a scalar field $u$. If $u$ were to be a vector field, then replace the boundary conditions and source function with vector fields. An example implementation can be seen in `examplevectorField.jl`.
+Here, we solved the Poisson equation for a scalar field $u$. If $u$ were to be a vector field, then replace the boundary conditions and source function with vector fields. An example implementation can be seen in `examplevectorField.jl`. One can also compute gradient of a vector field, and the curl of a 2D vector field can be computed  with `curl_u(x) = mean(∇xû(x, Θ) for k ∈ 1:num_Samples)`.
 
 ## Example outputs
 ![Animated boundary conditions](./images/AnimatedBCs.gif)
@@ -123,8 +141,8 @@ If the solution to the Poisson equation is a vector field, the `solvePoissonGrad
 
 More outputs can be viewed in the `images` directory.
 
-## Next steps
-- Extend solver for 3D domains
+## Potential next steps
+- Extend the solver for 3D domains
 - Visualise 2D vector fields [[paper](https://vc.tf.fau.de/publications/Tian25EuroVisShort/Tian25EuroVisShort.pdf)]
 - Visualise cross sections of 3D fields
 - Visualise 3D scalar (and vector) fields

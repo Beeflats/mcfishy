@@ -24,3 +24,7 @@ function solvePoissonCurl(x::Point3, Ω::Scene, f::Function, WoS_depth::Integer,
     ∇u = solvePoissonGradient(x, Ω, f, WoS_depth, num_Samples, ϵ)
     return convertGradToCurl(∇u)
 end
+
+function ∇xû(x::Point, Θ::Parameters)
+    return solvePoissonCurl(x, Θ.scene, Θ.forcing, Θ.depth, Θ.thickness)
+end

@@ -29,3 +29,7 @@ function solvePoisson(x::Point, Ω::Scene, f::Function, WoS_depth::Integer, num_
     num_Samples > 0 || throw(ArgumentError("num_Samples must be positive"))
     return mean([walkOnSphere_Poisson(x, Ω, f, WoS_depth, ϵ) for _ in 1:num_Samples])
 end
+
+function û(x::Point, Θ::Parameters)
+    return walkOnSphere_Poisson(x, Θ.scene, Θ.forcing, Θ.depth, Θ.thickness)
+end

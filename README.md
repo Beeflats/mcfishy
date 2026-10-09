@@ -35,13 +35,13 @@ $$\hat u(\mathbf{x}_k) :=
     \hat u(\mathbf{x}_{k+1}) - |B_\Gamma(\mathbf{x}_k)|f(\mathbf{y}_k)G(\mathbf{x}_k, \mathbf{y}_k)  & \text{otherwise}
 \end{cases} $$
 
-with $B_\Gamma(\mathbf{x}) = \{\mathbf{y}\in\mathbb{R}^2: d(\mathbf{x}, \mathbf{y})= d(\mathbf{x},\Gamma)\}$ is a circle whose radius is $d(\mathbf{x},\Gamma)$, and $\mathbf{x}_{k+1}$ is drawn from a uniform distribution of $B_\Gamma(x_k)$. 
+with $B_\Gamma(\mathbf{x}) = \\{\mathbf{y}\in\mathbb{R}^2: d(\mathbf{x}, \mathbf{y})= d(\mathbf{x},\Gamma)\\}$ is a circle whose radius is $d(\mathbf{x},\Gamma)$, and $\mathbf{x}_{k+1}$ is drawn from a uniform distribution of $B\_\Gamma(x_k)$. 
 
-The algorithm will almost certainly never terminate as the sampled point is unlikely to coincide with the boundary. The algorithm is altered such that when $d(\mathbf{x}_k, \mathbf{x}_{k+1})$ is less than some small value $\varepsilon$, it terminates and evaluates $g(\mathbf{\bar x}_k)$ where $\mathbf{\bar x}$ is the point on the boundary  closest to the point $\mathbf{x}_k$, i.e. $\mathbf{\bar x}_k = \underset{\mathbf{z}\in\partial\Gamma}{\text{arg min }} d(\mathbf{x}_k,\mathbf{z})$. Other ways of terminating the algorithm is to set an limit, $K$, to how high $k$ can be. Thus, in practice, the algorithm for $\hat u(x_k)$ is as follows:
+The algorithm will almost certainly never terminate as the sampled point is unlikely to coincide with the boundary. The algorithm is altered such that when $d(\mathbf{x}_k, \mathbf{x}\_{k+1})$ is less than some small value $\varepsilon$, it terminates and evaluates $g(\mathbf{\bar x}_k)$ where $\mathbf{\bar x}$ is the point on the boundary  closest to the point $\mathbf{x}_k$, i.e. $\mathbf{\bar x}_k = \underset{\mathbf{z}\in\partial\Gamma}{\text{arg min }} d(\mathbf{x}_k,\mathbf{z})$. Other ways of terminating the algorithm is to set an limit, $K$, to how high $k$ can be. Thus, in practice, the algorithm for $\hat u(x_k)$ is as follows:
 
 $$\hat u(\mathbf{x}_k; f, \Gamma, g, K, \epsilon) :=
 \begin{cases}
-    g(\mathbf{x}_k) & \text{if }d(\mathbf{x}_k, \mathbf{x}_{k+1})<\epsilon \text{ or }k > K\\
+    g(\mathbf{\bar x}_k) & \text{if }d(\mathbf{x}_k, \mathbf{x}_{k+1})<\epsilon \text{ or }k > K\\
     \hat u(\mathbf{x}_{k+1}) - |B_\Gamma(\mathbf{x}_k)|f(\mathbf{y}_k)G(\mathbf{x}_k, \mathbf{y}_k)  & \text{otherwise}
 \end{cases} $$
 
@@ -62,7 +62,7 @@ bc₂(x) = 2.0 + cos(4x.x)
 line = LineSegment(Point(-3.0, -2.0), Point(3.0, -2.0))
 bc_line(x) = 2.0 + sin(4x.x)
 ```
-A circle with center $\mathbf{C}$ and radius $r$ is the set $\{x\in\mathbf{R}^2: d(\mathbf{C}, \mathbf{x}) = r\}$, and a line segment with endpoints $\mathbf{p},\mathbf{q}$ is the set where the strict triangle inequality holds: $\{x\in\mathbf{R}^2: d(\mathbf{p}, \mathbf{x})+d(\mathbf{x},\mathbf{q}) = d(\mathbf{p}, \mathbf{q})\}$.
+A circle with center $\mathbf{C}$ and radius $r$ is the set $\\{x\in\mathbf{R}^2: d(\mathbf{C}, \mathbf{x}) = r\\}$, and a line segment with endpoints $\mathbf{p},\mathbf{q}$ is the set where the strict triangle inequality holds: $\\{x\in\mathbf{R}^2: d(\mathbf{p}, \mathbf{x})+d(\mathbf{x},\mathbf{q}) = d(\mathbf{p}, \mathbf{q})\\}$.
 
 
 A scene, $\partial\mathbb{S}$, is defined to be the union of the geometric primitives and their assigned boundary condition(s). 
